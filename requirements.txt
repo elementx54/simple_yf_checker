@@ -1,4 +1,6 @@
+pip
 ipykernel
+numpy
 pandas
 matplotlib
 scipy

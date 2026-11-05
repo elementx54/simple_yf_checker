@@ -88,3 +88,31 @@ python query_prices.py VT --start 2020-01-01 --end 2025-12-31 --csv vt_prices.cs
 ## Important first-run validation
 
 After the initial download, inspect row counts and date ranges for all four ETFs. Confirm that the newest daily bar is for a completed trading session before relying on it in a backtest. This starter project logs a successful Yahoo response, but does not independently certify that the response contains the final official closing bar.
+
+## Backtesting
+
+Total-return mode (default $10,000; dividend reinvestment reflected in adjusted close):
+
+```bash
+python backtest.py UPRO --start 2015-01-01 --end 2025-12-31 --mode total-return
+```
+
+Explicit fractional-share accounting with dividends reinvested at the ex-date close:
+
+```bash
+python backtest.py UPRO --start 2015-01-01 --end 2025-12-31 --mode share-accounting
+```
+
+Set a different starting amount and export daily portfolio values:
+
+```bash
+python backtest.py VT --start 2015-01-01 --end 2025-12-31 --initial-capital 25000 --mode total-return --csv vt_backtest.csv
+```
+
+### Reinvestment assumptions and cautions
+
+- **Total-return mode:** Uses Yahoo Finance `Adj Close`; distributions are already reflected. Do not add the dividend table separately in this mode.
+- **Share-accounting mode:** Buys fractional shares at the first available close, then reinvests distributions at the ex-dividend date's close. This is an approximation, not an exact broker DRIP simulation: the simple yfinance history data does not provide reliable dividend payment dates or broker-specific reinvestment prices.
+- Yahoo Finance historical OHLC prices are split-adjusted; the share-accounting mode does not apply split ratios again.
+- Both modes use actual ETF performance, so operating expenses are already reflected. Do not subtract expense ratios again.
+- These examples omit taxes, commissions, bid/ask spread, slippage, and cash drag between dividend entitlement and reinvestment.
